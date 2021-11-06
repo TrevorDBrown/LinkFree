@@ -1,0 +1,23 @@
+{
+  "name": "linkfree",
+  "version": "0.1.0",
+  "description": "An open source interpretation of Linktree.",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TrevorDBrown/LinkFree.git"
+  },
+  "author": "Trevor D. Brown",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TrevorDBrown/LinkFree/issues"
+  },
+  "homepage": "https://github.com/TrevorDBrown/LinkFree#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.10",
+    "express": "^4.17.1"
+  }
+}
