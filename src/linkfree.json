@@ -1,0 +1,34 @@
+{
+    "displayName": "Trevor D. Brown",
+    "theme": "DarkMode",
+    "linkTrayOnTop": true,
+    "links": [
+        {
+            "linkName": "Testing Link",
+            "linkType": "web",
+            "inLinkTray": false,
+            "linkPosition": 1,
+            "linkHref": "https://trevordylanbrown.com",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "Facebook",
+            "linkType": "facebook",
+            "inLinkTray": true,
+            "linkPosition": 1,
+            "linkHref": "https://facebook.com/trevordylanbrown",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "Twitter",
+            "linkType": "twitter",
+            "inLinkTray": true,
+            "linkPosition": 2,
+            "linkHref": "https://twitter.com/Trevor_D_Brown",
+            "newWindow": false,
+            "hide": false
+        }
+    ]
+}
