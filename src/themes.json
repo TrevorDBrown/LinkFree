@@ -1,0 +1,41 @@
+{
+    "themesDirectory": "themes/",
+    "defaultTheme": {
+        "themeName": "default",
+        "css": "style.css",
+        "available": true,
+        "note": "This is the default theme."
+    },
+    "themes": [
+        {
+            "themeName": "3D Theme",
+            "css": "style.css",
+            "available": true,
+            "note": ""
+        },
+        {
+            "themeName": "90'sTheme",
+            "css": "style.css",
+            "available": true,
+            "note": "Some interactivity not available yet."
+        },
+        {
+            "themeName": "A mocha, please! (Netlify Form)",
+            "css": "style.css",
+            "available": true,
+            "note": ""
+        },
+        {
+            "themeName": "DarkMode",
+            "css": "style.css",
+            "available": true,
+            "note": ""
+        },
+        {
+            "themeName": "Journal",
+            "css": "style.css",
+            "available": true,
+            "note": ""
+        }
+    ]
+}
