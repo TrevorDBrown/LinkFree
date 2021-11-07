@@ -11,6 +11,11 @@ const app = express();
 
 const linkfree = require('./linkfree');
 
+app.use('/fa/', express.static(__dirname + "./../node_modules/@fortawesome/fontawesome-free/"));
+app.use('/images/', express.static(__dirname + "/images/"));
+app.use('/js/', express.static(__dirname + "/js/"));
+app.use('/css/', express.static(__dirname + "/css/"));
+
 // Endpoints
 app.get('/', (req, res) => {
     linkfree.generateLinkPage((error, pageContent) => {
