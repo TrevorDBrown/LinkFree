@@ -14,18 +14,6 @@
             "note": ""
         },
         {
-            "themeName": "90'sTheme",
-            "css": "style.css",
-            "available": true,
-            "note": "Some interactivity not available yet."
-        },
-        {
-            "themeName": "A mocha, please! (Netlify Form)",
-            "css": "style.css",
-            "available": true,
-            "note": ""
-        },
-        {
             "themeName": "DarkMode",
             "css": "style.css",
             "available": true,
@@ -36,6 +24,62 @@
             "css": "style.css",
             "available": true,
             "note": ""
+        },
+        {
+            "themeName": "Standard",
+            "css": "style.css",
+            "available": true,
+            "note": ""
+        }
+    ],
+    "linkThemes": [
+        {
+            "linkType": "web",
+            "class": "fas fa-link"
+        },
+        {
+            "linkType": "email",
+            "class": "fas fa-envelope"
+        },
+        {
+            "linkType": "cellphone",
+            "class": "fas fa-mobile"
+        },
+        {
+            "linkType": "landline",
+            "class": "fas fa-phone"
+        },
+        {
+            "linkType": "facebook",
+            "class": "fab fa-facebook"
+        },
+        {
+            "linkType": "instagram",
+            "class": "fab fa-instagram"
+        },
+        {
+            "linkType": "twitter",
+            "class": "fab fa-twitter"
+        },
+        {
+            "linkType": "linkedin",
+            "class": "fab fa-linkedin"
+        },
+        {
+            "linkType": "quora",
+            "class": "fab fa-quora"
+        },
+        {
+            "linkType": "github",
+            "class":  "fab fa-github"
+        },
+        {
+            "linkType": "snapchat",
+            "class": "fab fa-snapchat"
+        },
+        {
+            "linkType": "dev-community",
+            "class": "fab fa-dev"
         }
     ]
 }
