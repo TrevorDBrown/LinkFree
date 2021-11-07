@@ -1,0 +1,99 @@
+{
+    "displayName": "Trevor D. Brown",
+    "tagline": "Systems Analyst II at Logan Aluminum, Inc. Computer Science Graduate Student at Western Kentucky University (WKU).",
+    "profilePicture": "./images/Profile.png",
+    "theme": "DarkMode",
+    "linkTrayOnTop": true,
+    "links": [
+        {
+            "linkName": "Personal Website",
+            "linkType": "web",
+            "inLinkTray": false,
+            "linkPosition": 1,
+            "linkHref": "https://trevordylanbrown.com",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "WKU XR Lab",
+            "linkType": "web",
+            "inLinkTray": false,
+            "linkPosition": 2,
+            "linkHref": "https://www.wku.edu/xr",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "Facebook",
+            "linkType": "facebook",
+            "inLinkTray": true,
+            "linkPosition": 1,
+            "linkHref": "https://facebook.com/trevordylanbrown",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "Instagram",
+            "linkType": "instagram",
+            "inLinkTray": true,
+            "linkPosition": 2,
+            "linkHref": "https://www.instagram.com/trevordylanbrown/",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "Twitter",
+            "linkType": "twitter",
+            "inLinkTray": true,
+            "linkPosition": 3,
+            "linkHref": "https://twitter.com/Trevor_D_Brown",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "Linkedin",
+            "linkType": "linkedin",
+            "inLinkTray": true,
+            "linkPosition": 4,
+            "linkHref": "https://www.linkedin.com/in/trevordylanbrown/",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "GitHub",
+            "linkType": "github",
+            "inLinkTray": true,
+            "linkPosition": 5,
+            "linkHref": "https://github.com/TrevorDBrown",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "Quora",
+            "linkType": "quora",
+            "inLinkTray": true,
+            "linkPosition": 6,
+            "linkHref": "https://www.quora.com/profile/Trevor-D-Brown",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "Snapchat",
+            "linkType": "snapchat",
+            "inLinkTray": true,
+            "linkPosition": 7,
+            "linkHref": "https://www.snapchat.com/add/trevordbrown",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "DEV",
+            "linkType": "dev-community",
+            "inLinkTray": true,
+            "linkPosition": 8,
+            "linkHref": "https://dev.to/trevordbrown",
+            "newWindow": true,
+            "hide": false
+        }
+    ]
+}
