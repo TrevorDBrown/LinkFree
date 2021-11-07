@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/TrevorDBrown/LinkFree#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.4",
     "cheerio": "^1.0.0-rc.10",
     "express": "^4.17.1"
   }
