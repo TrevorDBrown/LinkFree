@@ -1,45 +1,58 @@
-# LinkFree
+# LinkFreePlus
 
-A free and open source alternative to LinkTree!
+A free and open source alternative to LinkTree (and other link service providers)! Based on [Linkfree](https://github.com/michaelbarney/Linkfree) by [Michael Barney](https://github.com/MichaelBarney).
 
-[Website](https://michaelbarney.github.io/LinkFree)
+## What is LinkFreePlus?
 
-<img src="https://i.imgur.com/B4LX0kY.png" alt="alt text" width="250px">
-
-## What is LinkFree?
-
-Ever wanted to add more links to your Instagram bio? LinkFree does just that! It gathers all of your links into one page that is easy to navigate.
+LinkFreePlus does the same exact thing as LinkFree, but enhances the experience by making LinkFree pages dynamic. This allows you to change your themes on the fly (if you decide to do so).
 
 ## What are the benefits?
 
-Compared to other solutions, LinkFree is fully customizable and open source!
+Just like LinkFree, when compared to other solutions, LinkFreePlus is fully customizable and open source!
 
-- No more pesky third party logos
-- Add your custom colors, images and fonts
-- Use full custom analytics and metrics platforms
+- No pesky third party logos.
+- Add your custom colors, images and fonts.
+- Use full custom analytics and metrics platforms* (see [How to see analytics and other stats?](#how-to-see-analytics-and-other-stats) for more information.)
 - Create your own template or use one made by the community!
 
 ## How to use?
 
-To startoff, you can choose a template for your LinkFree in the "Templates" directory. Then you can clone or fork this repository to adapt it with your information.
+To utilize LinkFreePlus, do the following:
 
-You can fork this repository to your own account and there configure your personal page using github pages. This will let you make edits much faster.
+1. Clone [this repository](https://github.com/TrevorDBrown/LinkFreePlus).
+2. Run the following commands:
 
-## How to see statistics?
+    ```sh
+    cd [Location of cloned repository]
+    npm install .
+    cd src/
+    [Editor of your choice] linkfree.json
+    ```
 
-You can use any statiscs platform of your choosing that is based on client javascript. We recommend the following:
+3. Modify the linkfree.json file with your name, a tagline (optional), any links you would like to display, and the theme you would like to use. Refer to themes.json to get the list of compatible themes, the link "themes" (i.e. icons for link, if link is indicated as a "link tray" link.)
+4. Configure app.js to use the specific port you would like to use.
+5. Set up your web server environment as you desire.
+6. Set up your domain name as you desire.
+7. Run the following command:
 
-- [Amplitude](https://amplitude.com/homepage)
-- [Hotjar](https://www.hotjar.com/)
+    ```sh
+    node .
+    ```
 
-You can use any of the functions for load and click defined on the javascript file of the LinkFree template or add code snippets to the Head or Body of the HTML file.
+8. Enjoy!
+
+## How to see analytics and other stats?
+
+Analytics tools have yet to be integrated into this solution. If you would like to see a particular analytics service be integrated, please file an issue with the "enhancement" tag.
 
 ## How to contribute?
 
-There are a three ways you can contribute. You can make changes to the core LinkFree project, create new LinkFree templates or just share your LinkFree.
+There are a few different ways you can contribute. You can make changes to the [core LinkFree project](https://github.com/michaelbarney/Linkfree), make changes to [LinkFreePlus](https://github.com/TrevorDBrown/LinkFreePlus), create new LinkFree templates, suggest/implement new features (via Issues and Pull Requests, respectively) or simply fork and share your own LinkFreePlus!
 
-### Creating Templates
+### Creating Themes
 
-A new template is a general LinkFree that has a distinctive structure or style when compared to previous templates.
+A new theme (referred to as a "template" in LinkFree) is a theme that has a distinctive structure or style when compared to previous templates.
 
-To submit one, you just have to make a pull request with your addition in the "Templates" directory.
+Currently, all themes with a basic style.css structure are compatible with LinkFree and LinkFreePlus. However, support for more advanced themes (i.e. incorporating JavaScript, TypeScript, or other languages) will hopefully come soon.
+
+To submit a new theme, please make a pull request with your theme in the "src/themes" directory.
