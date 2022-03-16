@@ -80,6 +80,26 @@
         {
             "linkType": "dev-community",
             "class": "fab fa-dev"
+        },
+        {
+            "linkType": "vr",
+            "class": "fas fa-vr-cardboard"
+        },
+        {
+            "linkType": "tree",
+            "class": "fas fa-tree"
+        },
+        {
+            "linkType": "home",
+            "class": "fas fa-home"
+        },
+        {
+            "linkType": "cat",
+            "class": "fas fa-cat"
+        },
+        {
+            "linkType": "bible",
+            "class": "fas fa-bible"
         }
     ]
 }

@@ -1,24 +1,33 @@
 {
     "displayName": "Trevor D. Brown",
-    "tagline": "Systems Analyst II at Logan Aluminum, Inc. Computer Science Graduate Student at Western Kentucky University (WKU).",
+    "tagline": "Systems Analyst II at Logan Aluminum, Inc. Computer Science Graduate Student at Western Kentucky University (WKU). I stand with 🇺🇦.",
     "profilePicture": "./images/Profile.png",
     "theme": "DarkMode",
     "linkTrayOnTop": true,
     "links": [
         {
             "linkName": "Personal Website",
-            "linkType": "web",
-            "inLinkTray": false,
-            "linkPosition": 1,
+            "linkType": "home",
+            "inLinkTray": true,
+            "linkPosition": 9,
             "linkHref": "https://trevordylanbrown.com",
             "newWindow": true,
             "hide": false
         },
         {
+            "linkName": "Java the Tortie",
+            "linkType": "cat",
+            "inLinkTray": true,
+            "linkPosition": 10,
+            "linkHref": "https://www.instagram.com/javathetortie/",
+            "newWindow": true,
+            "hide": false
+        },
+        {
             "linkName": "WKU XR Lab",
-            "linkType": "web",
-            "inLinkTray": false,
-            "linkPosition": 2,
+            "linkType": "vr",
+            "inLinkTray": true,
+            "linkPosition": 11,
             "linkHref": "https://www.wku.edu/xr",
             "newWindow": true,
             "hide": false
@@ -46,7 +55,7 @@
             "linkType": "twitter",
             "inLinkTray": true,
             "linkPosition": 3,
-            "linkHref": "https://twitter.com/Trevor_D_Brown",
+            "linkHref": "https://twitter.com/nworbdrovert",
             "newWindow": true,
             "hide": false
         },
@@ -92,6 +101,33 @@
             "inLinkTray": true,
             "linkPosition": 8,
             "linkHref": "https://dev.to/trevordbrown",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "Living Hope Young Adult Ministry",
+            "linkType": "bible",
+            "inLinkTray": true,
+            "linkPosition": 12,
+            "linkHref": "https://livehopeful.com/young-adults",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "LinkTree",
+            "linkType": "tree",
+            "inLinkTray": true,
+            "linkPosition": 12,
+            "linkHref": "https://linktr.ee/trevordbrown",
+            "newWindow": true,
+            "hide": false
+        },
+        {
+            "linkName": "In a Ukraine ghost town, drivers and undertakers navigate war - LA Times (03/14/2022)",
+            "linkType": "web",
+            "inLinkTray": false,
+            "linkPosition": 1,
+            "linkHref": "https://www.latimes.com/world-nation/story/2022-03-14/irpin-volunteers-ghost-town-kyiv",
             "newWindow": true,
             "hide": false
         }
