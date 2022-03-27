@@ -1,6 +1,6 @@
 /*
 *   LinkFreePlus - an open source interpretation of Linktree.
-*   (c)2021 Trevor D. Brown. Distributed under MIT License.
+*   (c)2021-2022 Trevor D. Brown. Distributed under MIT License.
 *   Original Linkfree source: (c)2019-2021 MichaelBarney. Distributed under Apache License 2.0.
 *
 *   linkfree.js - generates your link page!
@@ -9,8 +9,53 @@
 const cheerio = require('cheerio');
 const fs = require('fs');
 
-var linkfreeConfigFilePath = './src/linkfree.json';
 var themesConfigFilePath = './src/themes.json';
+var linkfreeConfigFilePath = './src/private/linkfree.json';
+var analyticsConfigFilePath = './src/private/analytics.json';
+
+function generateAnalyticsTags(callback){
+    var headTags = []
+    var bodyTags = []
+    const $ = cheerio.load('');
+
+    fs.stat(analyticsConfigFilePath, (error, stats) => {
+        if (!error){
+            fs.readFile(analyticsConfigFilePath, (error, analyticsConfigFileContent) => {
+                if (!error){
+                    analyticsConfigFileContent = JSON.parse(analyticsConfigFileContent.toString());
+                    if (analyticsConfigFileContent.tags){
+                        analyticsConfigFileContent.tags.forEach(tag => {
+                            var tagType = "<" + tag.tagType + ">";
+                            var newTag = $(tagType);
+
+                            tag.attributes.forEach(attribute => {
+                                newTag.attr(attribute.attributeName, attribute.attributeValue);
+                            });
+
+                            newTag.append(tag.tagContent);
+
+                            if (tag.parentTag == "head"){
+                                headTags.push(newTag);
+                            }
+                            else if (tag.parentTag == "body"){
+                                bodyTags.push(newTag);
+                            }
+                        });
+
+                        return callback(null, headTags, bodyTags);
+
+                    }else{
+                        return callback(null, headTags, bodyTags)
+                    }
+                }else{
+                    return callback(error, headTags, bodyTags);
+                }
+            });
+        }else{
+            return callback(error, headTags, bodyTags);
+        }
+    });
+}
 
 function parseLinks(linkfreeConfig, callback){
     sortedLinkList = linkfreeConfig.links.sort((a,b) => {
@@ -100,7 +145,7 @@ function generatePageContent(linkfreeConfig, links, themesConfig, callback){
     charsetMetaTag.attr("charset", "UTF-8");
 
     var titleTag = $("<title>");
-    titleTag.append(linkfreeConfig.displayName + " | Linkfree");
+    titleTag.append(linkfreeConfig.displayName + " | LinkFree");
 
     var faCSSTag = $("<link>");
     faCSSTag.attr("rel", "stylesheet");
@@ -110,8 +155,7 @@ function generatePageContent(linkfreeConfig, links, themesConfig, callback){
     var faJSTag = $("<script>");
     faJSTag.attr("type", "application/javascript");
     faJSTag.attr("src", "./fa/js/all.min.js");
-
-
+    
     getTheme(false, linkfreeConfig, themesConfig, (error, themeCSSContent) => {
         var styleTag = $("<style>");
 
@@ -157,13 +201,20 @@ function generatePageContent(linkfreeConfig, links, themesConfig, callback){
             styleTag.append(linksTrayDivCSS);
         }
 
+        // Metadata
         headTag.append(viewportMetaTag);
         headTag.append(charsetMetaTag);
         headTag.append(titleTag);
+
+        // Theme Data
         headTag.append(styleTag);
+        
+        // Font Awesome
         headTag.append(faCSSTag);
         headTag.append(faJSTag);
+        
 
+        // Begin preparing body content.
         var bodyTag = $("body");
 
         var profileInfoDivTag = $("<div>");
@@ -240,8 +291,24 @@ function generatePageContent(linkfreeConfig, links, themesConfig, callback){
             bodyTag.append(linksDivTag);
             bodyTag.append(linksTrayDivTag);
         }
+
+        generateAnalyticsTags((error, headTags, bodyTags) => {
+            if (!error){
+                headTags.forEach(tag => {
+                    headTag.append(tag);
+                });
     
-        callback(null, $.html());
+                bodyTags.forEach(tag => {
+                    bodyTag.append(tag);
+                });
+
+                callback(null, $.html());
+            }else{
+                callback(null, $.html());
+            }
+        });
+
+        // callback(null, $.html());
 
     });
 }
@@ -278,4 +345,30 @@ var generateLinkPage = function generateLinkPage(callback){
     });
 }
 
+var areJSONFilesPresent = function areJSONFilesPresent(callback){
+    var isThemesJSONPresent = false;
+    var isLinkFreeJSONPresent = false;
+
+    fs.stat(themesConfigFilePath, function(error, themesStats){
+        if (!error){
+            isThemesJSONPresent = true;
+        }else{
+            isThemesJSONPresent = false;
+        }
+
+        fs.stat(linkfreeConfigFilePath, function(error, linkfreeStats){
+            if (!error){
+                isLinkFreeJSONPresent = true;
+            }else{
+                isLinkFreeJSONPresent = false;
+            }
+
+            return callback(null, isThemesJSONPresent, isLinkFreeJSONPresent);
+        });
+    });
+
+
+}
+
 module.exports.generateLinkPage = generateLinkPage;
+module.exports.areJSONFilesPresent = areJSONFilesPresent;
