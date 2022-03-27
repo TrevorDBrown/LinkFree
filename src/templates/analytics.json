@@ -1,0 +1,30 @@
+
+{
+    "analyticsServiceName": "Google Analytics",
+    "analyticsServiceUniqueID": "Your Google Analytics ID Here",
+    "tags": [
+        {
+            "tagName": "gtag",
+            "tagType": "script",
+            "parentTag": "head",
+            "attributes": [
+                {
+                    "attributeName": "async",
+                    "attributeValue": ""
+                },
+                {
+                    "attributeName": "src",
+                    "attributeValue": "https://www.googletagmanager.com/gtag/js?id=Your Google Analytics ID Here"
+                }
+            ],
+            "tagContent": ""
+        },
+        {
+            "tagName": "gtag-script",
+            "tagType": "script",
+            "parentTag": "head",
+            "attributes": [],
+            "tagContent": "window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'Your Google Analytics ID Here');"
+        }
+    ]
+}
