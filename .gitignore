@@ -117,3 +117,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Private Directory - stores all instance-specific content for users, without exposing it to the common code.
+src/private/
