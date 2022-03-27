@@ -1,6 +1,6 @@
 /*
 *   LinkFreePlus - an open source interpretation of Linktree.
-*   (c)2021 Trevor D. Brown. Distributed under MIT License.
+*   (c)2021-2022 Trevor D. Brown. Distributed under MIT License.
 *   Original Linkfree source: (c)2019-2021 MichaelBarney. Distributed under Apache License 2.0.
 *
 *   app.js - application entry point.
@@ -12,19 +12,42 @@ const app = express();
 const linkfree = require('./linkfree');
 
 app.use('/fa/', express.static(__dirname + "./../node_modules/@fortawesome/fontawesome-free/"));
-app.use('/images/', express.static(__dirname + "/images/"));
 app.use('/js/', express.static(__dirname + "/js/"));
 app.use('/css/', express.static(__dirname + "/css/"));
+app.use('/images/', express.static(__dirname + "/images/"));
+app.use('/private/images/', express.static(__dirname + "/private/images/"));
 
 // Endpoints
 app.get('/', (req, res) => {
-    linkfree.generateLinkPage((error, pageContent) => {
-        if (!error){
-            res.status(200).send(pageContent);
+    linkfree.areJSONFilesPresent((error, isThemesJSONPresent, isLinkfreeJSONPresent) => {
+        if (isThemesJSONPresent && isLinkfreeJSONPresent){
+            // All core files are present. Continue processing...
+            linkfree.generateLinkPage((error, pageContent) => {
+                if (!error){
+                    res.status(200).send(pageContent);
+                }else{
+                    res.status(500).send(pageContent);
+                }
+            });
         }else{
-            res.status(500).send(pageContent);
+            // One or more core files are missing...
+            var errorResponse = "<p>Error - missing core files: <br /><br />";
+
+            if (!isThemesJSONPresent){
+                errorResponse += "themes.json <br />";
+            }
+
+            if (!isLinkfreeJSONPresent){
+                errorResponse += "linkfree.json <br />";
+            }
+
+            errorResponse += "<br />Please contact the site administrator for assistance.</p>";
+
+            res.status(500).send(errorResponse);
         }
     });
+
+
 });
 
 // Port for server (defined in environmental variable LF_PORT, or default to port 3000)
