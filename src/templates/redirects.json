@@ -1,0 +1,9 @@
+[
+    {
+        "redirectName": "A New Link",
+        "redirectPath": "example",
+        "redirectHref": "https://example.com/",
+        "redirectDelay": 0,
+        "redirectActive": true
+    }
+]
