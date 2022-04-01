@@ -13,50 +13,6 @@ var themesConfigFilePath = './src/themes.json';
 var linkfreeConfigFilePath = './src/private/linkfree.json';
 var analyticsConfigFilePath = './src/private/analytics.json';
 
-function generateAnalyticsTags(callback){
-    var headTags = []
-    var bodyTags = []
-    const $ = cheerio.load('');
-
-    fs.stat(analyticsConfigFilePath, (error, stats) => {
-        if (!error){
-            fs.readFile(analyticsConfigFilePath, (error, analyticsConfigFileContent) => {
-                if (!error){
-                    analyticsConfigFileContent = JSON.parse(analyticsConfigFileContent.toString());
-                    if (analyticsConfigFileContent.tags){
-                        analyticsConfigFileContent.tags.forEach(tag => {
-                            var tagType = "<" + tag.tagType + ">";
-                            var newTag = $(tagType);
-
-                            tag.attributes.forEach(attribute => {
-                                newTag.attr(attribute.attributeName, attribute.attributeValue);
-                            });
-
-                            newTag.append(tag.tagContent);
-
-                            if (tag.parentTag == "head"){
-                                headTags.push(newTag);
-                            }
-                            else if (tag.parentTag == "body"){
-                                bodyTags.push(newTag);
-                            }
-                        });
-
-                        return callback(null, headTags, bodyTags);
-
-                    }else{
-                        return callback(null, headTags, bodyTags)
-                    }
-                }else{
-                    return callback(error, headTags, bodyTags);
-                }
-            });
-        }else{
-            return callback(error, headTags, bodyTags);
-        }
-    });
-}
-
 function parseLinks(linkfreeConfig, callback){
     sortedLinkList = linkfreeConfig.links.sort((a,b) => {
         var returnValue = 0;
@@ -308,8 +264,6 @@ function generatePageContent(linkfreeConfig, links, themesConfig, callback){
             }
         });
 
-        // callback(null, $.html());
-
     });
 }
 
@@ -345,18 +299,18 @@ var generateLinkPage = function generateLinkPage(callback){
     });
 }
 
-var areJSONFilesPresent = function areJSONFilesPresent(callback){
+var areCoreFilesPresent = function areCoreFilesPresent(callback){
     var isThemesJSONPresent = false;
     var isLinkFreeJSONPresent = false;
 
-    fs.stat(themesConfigFilePath, function(error, themesStats){
+    fs.stat(themesConfigFilePath, (error, themesStats) => {
         if (!error){
             isThemesJSONPresent = true;
         }else{
             isThemesJSONPresent = false;
         }
 
-        fs.stat(linkfreeConfigFilePath, function(error, linkfreeStats){
+        fs.stat(linkfreeConfigFilePath, (error, linkfreeStats) => {
             if (!error){
                 isLinkFreeJSONPresent = true;
             }else{
@@ -367,8 +321,52 @@ var areJSONFilesPresent = function areJSONFilesPresent(callback){
         });
     });
 
+}
 
+function generateAnalyticsTags(callback){
+    var headTags = []
+    var bodyTags = []
+    const $ = cheerio.load('');
+
+    fs.stat(analyticsConfigFilePath, (error, stats) => {
+        if (!error){
+            fs.readFile(analyticsConfigFilePath, (error, analyticsConfigFileContent) => {
+                if (!error){
+                    analyticsConfigFileContent = JSON.parse(analyticsConfigFileContent.toString());
+                    if (analyticsConfigFileContent.tags){
+                        analyticsConfigFileContent.tags.forEach(tag => {
+                            var tagType = "<" + tag.tagType + ">";
+                            var newTag = $(tagType);
+
+                            tag.attributes.forEach(attribute => {
+                                newTag.attr(attribute.attributeName, attribute.attributeValue);
+                            });
+
+                            newTag.append(tag.tagContent);
+
+                            if (tag.parentTag == "head"){
+                                headTags.push(newTag);
+                            }
+                            else if (tag.parentTag == "body"){
+                                bodyTags.push(newTag);
+                            }
+                        });
+
+                        return callback(null, headTags, bodyTags);
+
+                    }else{
+                        return callback(null, headTags, bodyTags)
+                    }
+                }else{
+                    return callback(error, headTags, bodyTags);
+                }
+            });
+        }else{
+            return callback(error, headTags, bodyTags);
+        }
+    });
 }
 
 module.exports.generateLinkPage = generateLinkPage;
-module.exports.areJSONFilesPresent = areJSONFilesPresent;
+module.exports.areCoreFilesPresent = areCoreFilesPresent;
+module.exports.generateAnalyticsTags = generateAnalyticsTags;
