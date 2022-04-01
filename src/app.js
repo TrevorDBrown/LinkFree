@@ -10,6 +10,7 @@ const express = require('express');
 const app = express();
 
 const linkfree = require('./linkfree');
+const redirects = require('./redirects');
 
 app.use('/fa/', express.static(__dirname + "./../node_modules/@fortawesome/fontawesome-free/"));
 app.use('/js/', express.static(__dirname + "/js/"));
@@ -18,8 +19,8 @@ app.use('/images/', express.static(__dirname + "/images/"));
 app.use('/private/images/', express.static(__dirname + "/private/images/"));
 
 // Endpoints
-app.get('/', (req, res) => {
-    linkfree.areJSONFilesPresent((error, isThemesJSONPresent, isLinkfreeJSONPresent) => {
+app.get('/', (req, res, next) => {
+    linkfree.areCoreFilesPresent((error, isThemesJSONPresent, isLinkfreeJSONPresent) => {
         if (isThemesJSONPresent && isLinkfreeJSONPresent){
             // All core files are present. Continue processing...
             linkfree.generateLinkPage((error, pageContent) => {
@@ -47,7 +48,32 @@ app.get('/', (req, res) => {
         }
     });
 
+});
 
+app.get('/:redirectPath', (req, res, next) => {
+    redirects.areCoreFilesPresent((error, isRedirectsJSONPresent) => {
+        if (isRedirectsJSONPresent){
+            // All core files are present. Continue processing...
+            redirects.generateRedirect(req.params.redirectPath, (error, pageContent) => {
+                if (!error){
+                    res.status(200).send(pageContent);
+                }else{
+                    res.redirect("/");
+                }
+            });
+        }else{
+            // One or more core files are missing...
+            var errorResponse = "<p>Error - missing core files: <br /><br />";
+
+            if (!isRedirectsJSONPresent){
+                errorResponse += "redirects.json <br />";
+            }
+
+            errorResponse += "<br />Please contact the site administrator for assistance.</p>";
+
+            res.status(500).send(errorResponse);
+        }
+    });
 });
 
 // Port for server (defined in environmental variable LF_PORT, or default to port 3000)
