@@ -36,6 +36,7 @@ body{
     display: block;
     margin: 27px auto;
 }
+
 .link{
     display: block;
     background-color: var(--accentColor);
@@ -50,7 +51,31 @@ body{
     border: solid var(--accentColor) 2px;
 }
 
-.link:hover{
+.link:hover:not(.link-icon){
     background-color: var(--bgColor);
     color: var(--accentColor);
+}
+
+.linkgroup-title {
+    color: var(--accentColor);
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.25;
+    display: block;
+    font-family: var(--font);
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    margin-bottom: 15px;
+}
+
+.link-group{
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.link-group > .link {
+    max-width: 675px;
 }

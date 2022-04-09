@@ -1,0 +1,114 @@
+{
+    "$schema": "http://json-schema.org/draft/2020-12/schema",
+    "$id": "https://trevordylanbrown.com/LinkFreePlus/linkfree.schema.json",
+    "title": "LinkFreePlus",
+    "description": "The configuration file for a LinkFreePlus instance.",
+    "type": "object",
+    "properties": {
+        "displayName": {
+            "description": "The display name at the top of a LinkFreePlus instance.",
+            "type": "string"
+        },
+        "tagline": {
+            "description": "A brief description or tagline associated with the subject of the LinkFreePlus instance.",
+            "type": "string"
+        },
+        "profilePicture": {
+            "description": "The path to an image representing the subject of the LinkFreePlus instance.",
+            "type": "string"
+        },
+        "theme": {
+            "description": "The name of the LinkFree/LinkFreePlus theme to be used by the LinkFreePlus instance.",
+            "type": "string"
+        },
+        "linkTrayOnTop": {
+            "description": "A boolean representing whether or not the link tray should be placed at the top of bottom of the LinkFreePlus instance.",
+            "type": "boolean"
+        },
+        "linkGroupsAboveUnsorted": {
+            "description": "A boolean representing whether or not organized links (i.e. links in a group) should go above or below unsorted links in the LinkFreePlus instance.",
+            "type": "boolean"
+        },
+        "linkGroups": {
+            "description": "A collection of link groups to be used for organization within the LinkFreePlus instance. Special groups that do not need to be defined are 'Link Tray' and 'Unsorted'.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "linkGroupName": {
+                        "description": "The name of the link group.",
+                        "type": "string"
+                    },
+                    "showLinkGroupName": {
+                        "description": "A boolean representing whether or not the link group's name should be visible.",
+                        "type": "boolean"
+                    },
+                    "useLinkIcons": {
+                        "description": "A boolean representing whether or not the link should display as text or an icon.",
+                        "type": "boolean"
+                    },
+                    "linkGroupPosition": {
+                        "description": "The order in which the group should appear compared to other groups.",
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "linkGroupEnabled": {
+                        "description": "A boolean representing whether or not a group should be visible within the LinkFreePlus instance.",
+                        "type": "boolean"
+                    }
+                }
+            }
+        },
+        "links": {
+            "description": "A collection of links displayed within the LinkFreePlus instance.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "linkName": {
+                        "description": "The display name of the link (when not in the link tray).",
+                        "type": "string"
+                    },
+                    "linkType": {
+                        "description": "The display icon of the link (when in the link tray).",
+                        "type": "string"
+                    },
+                    "linkHref": {
+                        "description": "The actual link address.",
+                        "type": "string"
+                    },
+                    "newWindow": {
+                        "description": "A boolean representing whether or not a link should open in a new tab/window.",
+                        "type": "boolean"
+                    },
+                    "enabled": {
+                        "description": "A boolean representing whether or not a link should be enabled globally (group settings override this value).",
+                        "type": "boolean"
+                    },
+                    "linkGroups": {
+                        "description": "A collection of instances of the link within the LinkFreePlus instance. Empty array represents one unsorted instance, if enabled is true.",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "linkGroupName": {
+                                    "description": "The name of the link group in which the link should be added. Link group name must be in linkGroups array. Otherwise, it will be ignored and stored as an unsorted link.",
+                                    "type": "string"
+                                },
+                                "linkPosition": {
+                                    "description": "The order in which the link should appear relative to other links.",
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "show": {
+                                    "description": "A boolean representing whether or not the link should be visible within the group.",
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -10,17 +10,130 @@ const cheerio = require('cheerio');
 const fs = require('fs');
 
 var themesConfigFilePath = './src/themes.json';
-var linkfreeConfigFilePath = './src/private/linkfree.json';
+var linkFreeConfigFilePath = './src/private/linkfree.json';
 var analyticsConfigFilePath = './src/private/analytics.json';
 
-function parseLinks(linkfreeConfig, callback){
-    sortedLinkList = linkfreeConfig.links.sort((a,b) => {
+function getLinkGroupDivID (linkGroup){
+    var linkGroupDivID = ""
+
+    if (linkGroup.linkGroupName == "Tray"){
+        linkGroupDivID = "links-tray"
+    }else{
+        linkGroupDivID = "linkgroup-" + linkGroup.linkGroupName.replace(/ /g, '-').toLowerCase();
+    }
+
+    return linkGroupDivID;
+}
+
+function getLinkIconClass(linkType, linkThemes, callback){
+    var linkClass = linkThemes.find((linkTheme) => {
+        return linkTheme.linkType === linkType;
+    });
+
+    if (linkClass){
+        return callback(null, linkClass.class, null);
+    }else{
+        linkClass = linkThemes.find((linkTheme) => {
+            return linkTheme.linkType === "web";
+        });
+
+        return callback(true, null, linkClass.class);
+    }
+}
+
+function getLinkInstance(link, linkGroup){
+    return link.linkGroups.find((linkInstanceGroup) => {
+        return linkInstanceGroup.linkGroupName === linkGroup.linkGroupName;
+    });
+}
+
+function generateSpecialGroups(callback){
+    var specialGroups = []
+
+    // TODO: consider putting these into another JSON file? 
+    var linkTrayLinkGroup = {
+        "linkGroupName": "Tray",
+        "showLinkGroupName": false,
+        "useLinkIcons": true,
+        "linkGroupPosition": 0,
+        "linkGroupEnabled": true
+    };
+
+    var unsortedLinkGroup = {
+        "linkGroupName": "Unsorted",
+        "showLinkGroupName": false,
+        "useLinkIcons": false,
+        "linkGroupPosition": 0,
+        "linkGroupEnabled": true
+    };
+
+    specialGroups.push(unsortedLinkGroup);
+    specialGroups.push(linkTrayLinkGroup);
+
+    return callback(null, specialGroups);
+}
+
+function parseLinkGroups(linkFreeConfig, callback){
+
+    generateSpecialGroups((error, specialGroups) => {
+        var sortedGroupsList = linkFreeConfig.linkGroups.sort((a,b) => {
+            var returnValue = 0;
+    
+            if (a.linkGroupPosition > b.linkGroupPosition){
+                returnValue = 1;
+            }
+            if (a.linkGroupPosition < b.linkGroupPosition){
+                returnValue = -1;
+            }
+    
+            if (returnValue === 0){
+                if (a.linkGroupName > b.linkGroupName){
+                    returnValue = 1;
+                }else{
+                    returnValue = -1;
+                }
+            }
+
+            return returnValue;
+        });
+        
+        if (linkFreeConfig.linkGroupsAboveUnsorted){
+            sortedGroupsList.push(specialGroups.find(specialGroup => {
+                return specialGroup.linkGroupName === "Unsorted";
+            }));
+        }else{
+            sortedGroupsList.unshift(specialGroups.find(specialGroup => {
+                return specialGroup.linkGroupName === "Unsorted";
+            }));
+        }
+
+        if (linkFreeConfig.linkTrayOnTop){
+            sortedGroupsList.unshift(specialGroups.find(specialGroup => {
+                return specialGroup.linkGroupName === "Tray";
+            }));
+        }else{
+            sortedGroupsList.push(specialGroups.find(specialGroup => {
+                return specialGroup.linkGroupName === "Tray";
+            }));
+        }
+
+        return callback(null, sortedGroupsList);
+    });
+
+}
+
+function parseLinks(linkList, linkGroup, callback){
+
+    sortedLinkList = linkList.sort((a,b) => {
+        var linkAInstance = getLinkInstance(a, linkGroup);
+        var linkBInstance = getLinkInstance(b, linkGroup);
+
         var returnValue = 0;
 
-        if (a.linkPosition > b.linkPosition){
+        if (linkAInstance.linkPosition > linkBInstance.linkPosition){
             returnValue = 1;
         }
-        if (a.linkPosition < b.linkPosition){
+        if (linkAInstance.linkPosition < linkBInstance.linkPosition){
             returnValue = -1;
         }
 
@@ -35,11 +148,100 @@ function parseLinks(linkfreeConfig, callback){
         return returnValue;
     });
 
-    callback(null, sortedLinkList);
+    return callback(null, sortedLinkList);
 
 }
 
-function getTheme(useDefault, linkfreeConfig, themesConfig, callback){
+function displayLinkTextOrIcon(linkFreeConfig, linkGroup, callback){
+    linkGroupConfig = linkFreeConfig.linkGroups.find((linkGroupInstance) => {
+        return linkGroupInstance.linkGroupName === linkGroup.linkGroupName;
+    });
+
+    return callback(null, linkGroupConfig.useLinkIcons)
+}
+
+function getLinkListForGroup(linkFreeConfig, linkGroup, callback){
+    linksForGroup = linkFreeConfig.links.filter((link) => {
+        return link.linkGroups.find(linkGroupInstance => {
+            return linkGroupInstance.linkGroupName === linkGroup.linkGroupName;
+        });
+    });
+
+    parseLinks(linksForGroup, linkGroup, (error, sortedLinkList) => {
+        if (!error){
+            return callback(null, sortedLinkList)
+        }else{
+            return callback(error, null);
+        }
+    });
+}
+
+function generateLinks(linkFreeConfig, themesConfig, linkGroups, $, callback){
+
+    // Sort the links by their groups.
+    linkGroups.forEach(linkGroup => {
+        // Find all links in the config associated with this group.
+        getLinkListForGroup(linkFreeConfig, linkGroup, (error, linkList) => {
+            var linkGroupDivID = "#" + getLinkGroupDivID(linkGroup); // Results in: linkgroup-group-name (or links-tray)
+
+            var linkGroupDiv = $(linkGroupDivID);
+
+            if (!error){
+                linkList.forEach(link => {
+
+                    if (link.enabled){
+                        // Prepare the base link
+                        var linkTag = $("<a>");
+                        linkTag.attr("href", link.linkHref);
+            
+                        if (link.newWindow){
+                            linkTag.attr("target", "_blank");
+                        }
+
+                        linkTag.attr("class", "link");
+
+                        linkGroupInstance = link.linkGroups.find((linkGroupInstance) => {
+                            return linkGroupInstance.linkGroupName === linkGroup.linkGroupName;
+                        });
+            
+                        if (linkGroupInstance.show){
+                            var linkTagInstance = linkTag.clone();
+        
+                            displayLinkTextOrIcon(linkFreeConfig, linkGroup, (error, displayAsIcon) => {
+                                if (displayAsIcon){
+                                    linkTagInstance.addClass("link-icon");
+                                    
+                                    getLinkIconClass(link.linkType, themesConfig.linkThemes, (error, linkClass, defaultLinkClass) => {
+                                        var linkTrayLinkTextTag = $("<i>");
+                
+                                        if (!error){
+                                            linkTrayLinkTextTag.addClass(linkClass);
+                                        }else{
+                                            linkTrayLinkTextTag.addClass(defaultLinkClass);
+                                        }
+                
+                                        linkTagInstance.append(linkTrayLinkTextTag);
+                                        linkGroupDiv.append(linkTagInstance);
+                                    });        
+                                }else{
+                                    linkTagInstance.append(link.linkName);
+                                    linkGroupDiv.append(linkTagInstance);
+                                }
+                            });
+                        }
+                        
+                    }
+                });
+            }else{
+                console.log(error);
+            }
+        });
+    });
+
+    return callback(null, $);
+}
+
+function getTheme(useDefault, linkFreeConfig, themesConfig, callback){
 
     var requestedTheme;
     var themeSettings;
@@ -47,7 +249,7 @@ function getTheme(useDefault, linkfreeConfig, themesConfig, callback){
     if (useDefault){
         themeSettings = themesConfig.defaultTheme;;
     }else{
-        requestedTheme = linkfreeConfig.theme;
+        requestedTheme = linkFreeConfig.theme;
         themeSettings = themesConfig.themes.filter((theme) => {
             return theme.themeName === requestedTheme;
         })[0];
@@ -60,36 +262,19 @@ function getTheme(useDefault, linkfreeConfig, themesConfig, callback){
             if (!error){
                 return callback(null, content.toString());
             }else{
-                getTheme(true, linkfreeConfig, themesConfig, (error, content) => {
+                getTheme(true, linkFreeConfig, themesConfig, (error, content) => {
                     return callback(null, content.toString());
                 });
             }
         });
     }else{
-        getTheme(true, linkfreeConfig, themesConfig, (error, content) => {
+        getTheme(true, linkFreeConfig, themesConfig, (error, content) => {
             return callback(null, content.toString());
         });
     }
 }
 
-function getLinkTrayLinkClass(linkType, linkThemes, callback){
-    var linkClass = linkThemes.filter((linkTheme) => {
-        return linkTheme.linkType === linkType;
-    })[0];
-
-    if (linkClass){
-        callback(null, linkClass.class, null);
-    }else{
-        linkClass = linkThemes.filter((linkTheme) => {
-            return linkTheme.linkType === "web";
-        })[0];
-
-        callback(true, null, linkClass.class);
-    }
-}
-
-
-function generatePageContent(linkfreeConfig, links, themesConfig, callback){
+function generatePageContent(linkFreeConfig, linkGroups, themesConfig, callback){
     const $ = cheerio.load('');
     var headTag = $("head");
     
@@ -101,7 +286,7 @@ function generatePageContent(linkfreeConfig, links, themesConfig, callback){
     charsetMetaTag.attr("charset", "UTF-8");
 
     var titleTag = $("<title>");
-    titleTag.append(linkfreeConfig.displayName + " | LinkFree");
+    titleTag.append(linkFreeConfig.displayName + " | LinkFree");
 
     var faCSSTag = $("<link>");
     faCSSTag.attr("rel", "stylesheet");
@@ -112,17 +297,17 @@ function generatePageContent(linkfreeConfig, links, themesConfig, callback){
     faJSTag.attr("type", "application/javascript");
     faJSTag.attr("src", "./fa/js/all.min.js");
     
-    getTheme(false, linkfreeConfig, themesConfig, (error, themeCSSContent) => {
+    getTheme(false, linkFreeConfig, themesConfig, (error, themeCSSContent) => {
         var styleTag = $("<style>");
 
         var linksTrayDivCSS = `
-            #linkfree-profile, #links-tray{
+            #linkfree-profile, #links-tray {
                 width: 100%;
                 text-align: center;
                 display: inline-block;
             }
 
-            #links-tray > .link {
+            #links-tray > .link, .link-icon {
                 display: inline-block;
                 margin: 5px; 
                 text-align: center;
@@ -133,7 +318,7 @@ function generatePageContent(linkfreeConfig, links, themesConfig, callback){
                 font-size: 50px;
             }
 
-            #links-tray > .link:hover {
+            #links-tray > .link:hover, .link.link-icon:hover {
                 opacity: 0.5;
             }
 
@@ -169,10 +354,10 @@ function generatePageContent(linkfreeConfig, links, themesConfig, callback){
         headTag.append(faCSSTag);
         headTag.append(faJSTag);
         
-
         // Begin preparing body content.
         var bodyTag = $("body");
 
+        // Profile Information
         var profileInfoDivTag = $("<div>");
         profileInfoDivTag.attr("id", "linkfree-profile");
 
@@ -185,116 +370,117 @@ function generatePageContent(linkfreeConfig, links, themesConfig, callback){
         var profileTaglineTag = $("<h4>");
         profileTaglineTag.attr("id", "linkfree-profile-tagline");
 
-        if (linkfreeConfig.profilePicture){
-            profilePictureTag.attr("src", linkfreeConfig.profilePicture);
+        // Profile Picture
+        if (linkFreeConfig.profilePicture){
+            profilePictureTag.attr("src", linkFreeConfig.profilePicture);
             profileInfoDivTag.append(profilePictureTag);
         }
 
-        if (linkfreeConfig.displayName){
-            profileNameTag.append(linkfreeConfig.displayName);
+        // Display Name
+        if (linkFreeConfig.displayName){
+            profileNameTag.append(linkFreeConfig.displayName);
             profileInfoDivTag.append(profileNameTag);
         }
 
-        if (linkfreeConfig.tagline){
-            profileTaglineTag.append(linkfreeConfig.tagline);
+        // Tagline/Description
+        if (linkFreeConfig.tagline){
+            profileTaglineTag.append(linkFreeConfig.tagline);
             profileInfoDivTag.append(profileTaglineTag);
         }
 
-        if (linkfreeConfig.profilePicture || linkfreeConfig.displayName || linkfreeConfig.tagline){
+        // Append Profile Information to Body
+        if (linkFreeConfig.profilePicture || linkFreeConfig.displayName || linkFreeConfig.tagline){
             bodyTag.append(profileInfoDivTag);
         }
 
-        var linksTrayDivTag = $("<div>");
-        linksTrayDivTag.attr("id", "links-tray");
-    
-        var linksDivTag = $("<div>");
-        linksDivTag.attr("id", "links");
-    
-        links.forEach(link => {
-            if (!link.hide){
-                var linkTag = $("<a>");
-                linkTag.attr("class", "link");
-                linkTag.attr("href", link.linkHref);
-    
-                if (link.newWindow){
-                    linkTag.attr("target", "_blank");
-                }
-    
-                if (link.inLinkTray){
-                    getLinkTrayLinkClass(link.linkType, themesConfig.linkThemes, (error, linkClass, defaultLinkClass) => {
-                        var linkTrayLinkTextTag = $("<i>");
+        var linksTrayDiv = $("<div>");
+        linksTrayDiv.attr("id", "links-tray");
 
-                        if (!error){
-                            linkTrayLinkTextTag.addClass(linkClass);
-                        }else{
-                            linkTrayLinkTextTag.addClass(defaultLinkClass);
-                        }
+        var linksDiv = $("<div>");
+        linksDiv.attr("id", "links");
 
-                        linkTag.append(linkTrayLinkTextTag);
-                        linksTrayDivTag.append(linkTag);
-                    });
-                }else{
-                    linkTag.append(link.linkName);
-                    linksDivTag.append(linkTag);
+        // Add the link groups to the page...
+        linkGroups.forEach(linkGroup => {
+            var newLinkGroup = $("<div>");
+            var newLinkGroupID = "";
+
+            if (linkGroup.linkGroupName != "Tray"){
+                newLinkGroupID = getLinkGroupDivID(linkGroup);   // Results in: linkgroup-group-name
+                newLinkGroup.attr("id", newLinkGroupID);
+                newLinkGroup.addClass("link-group");
+
+                if (linkGroup.showLinkGroupName){
+                    var newLinkGroupNameTextTag = $("<span>");
+                    newLinkGroupNameTextTag.addClass("linkgroup-title");
+
+                    newLinkGroupNameTextTag.append(linkGroup.linkGroupName);
+                    newLinkGroup.append(newLinkGroupNameTextTag);
                 }
+
+                linksDiv.append(newLinkGroup);
             }
+
         });
 
-        if (linkfreeConfig.linkTrayOnTop){
-            bodyTag.append(linksTrayDivTag);
-            bodyTag.append(linksDivTag);
+        if (linkFreeConfig.linkTrayOnTop){
+            bodyTag.append(linksTrayDiv);
+            bodyTag.append(linksDiv);
         }else{
-            bodyTag.append(linksDivTag);
-            bodyTag.append(linksTrayDivTag);
+            bodyTag.append(linksDiv);
+            bodyTag.append(linksTrayDiv);
         }
 
-        generateAnalyticsTags((error, headTags, bodyTags) => {
-            if (!error){
-                headTags.forEach(tag => {
-                    headTag.append(tag);
-                });
+        generateLinks(linkFreeConfig, themesConfig, linkGroups, $, (error, $) => {
+            generateAnalyticsTags((error, headTags, bodyTags) => {
+                if (!error){
+                    headTags.forEach(tag => {
+                        headTag.append(tag);
+                    });
+        
+                    bodyTags.forEach(tag => {
+                        bodyTag.append(tag);
+                    });
     
-                bodyTags.forEach(tag => {
-                    bodyTag.append(tag);
-                });
-
-                callback(null, $.html());
-            }else{
-                callback(null, $.html());
-            }
+                    return callback(null, $.html());
+                }else{
+                    return callback(null, $.html());
+                }
+            });
         });
-
     });
 }
 
 var generateLinkPage = function generateLinkPage(callback){
-    fs.readFile(linkfreeConfigFilePath, (error, linkfreeConfigFileContent) => {
-        var linkfreeConfig = JSON.parse(linkfreeConfigFileContent.toString());
+    fs.readFile(linkFreeConfigFilePath, (error, linkFreeConfigFileContent) => {
+        var linkFreeConfig = JSON.parse(linkFreeConfigFileContent.toString());
+
         if (!error){
-            parseLinks(linkfreeConfig, (error, linkList) => {
+            parseLinkGroups(linkFreeConfig, (error, linkGroupList) => {
+
                 if (!error){
                     fs.readFile(themesConfigFilePath, (error, themesConfigFileContent) => {
+                        
                         if (!error){
                             var themesConfig = JSON.parse(themesConfigFileContent.toString());
                             
-                            generatePageContent(linkfreeConfig, linkList, themesConfig, (error, page) => {
+                            generatePageContent(linkFreeConfig, linkGroupList, themesConfig, (error, page) => {
                                 if (!error){
-                                    callback(null, page);
+                                    return callback(null, page);
                                 }else{
-                                    callback(error, "An error occurred.");
+                                    return callback(error, "An error occurred.");
                                 }
                             });
 
                         }else{
-                            callback(error, "An error occurred.");
+                            return callback(error, "An error occurred.");
                         }
                     });
                 }else{
-                    callback(error, "An error occurred.");
+                    return callback(error, "An error occurred.");
                 }
             });
         }else{
-            callback(error, "An error occurred.");
+            return callback(error, "An error occurred.");
         }
     });
 }
@@ -310,7 +496,7 @@ var areCoreFilesPresent = function areCoreFilesPresent(callback){
             isThemesJSONPresent = false;
         }
 
-        fs.stat(linkfreeConfigFilePath, (error, linkfreeStats) => {
+        fs.stat(linkFreeConfigFilePath, (error, linkfreeStats) => {
             if (!error){
                 isLinkFreeJSONPresent = true;
             }else{

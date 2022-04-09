@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft/2020-12/schema",
+    "$id": "https://trevordylanbrown.com/LinkFreePlus/analytics.schema.json",
+    "title": "LinkFreePlus Analytics",
+    "description": "The Analytics configuration file for a LinkFreePlus instance.",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "redirectName": {
+                "description": "A common name to represent the redirect configuration.",
+                "type": "string"
+            },
+            "redirectPath": {
+                "description": "The local URI path, that will initiate the redirect.",
+                "type": "string"
+            },
+            "redirectHref": {
+                "description": "The URI path to the remote resource.",
+                "type": "string"
+            },
+            "redirectDelay": {
+                "description": "In seconds, the amount of time to elapse before the redirect initiates.",
+                "type": "integer",
+                "minimum": 0
+            },
+            "redirectActive": {
+                "description": "A boolean representing whether or not the redirect should be active.",
+                "type": "boolean"
+            }
+        }
+    }
+}

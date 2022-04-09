@@ -1,0 +1,59 @@
+{
+    "$schema": "http://json-schema.org/draft/2020-12/schema",
+    "$id": "https://trevordylanbrown.com/LinkFreePlus/analytics.schema.json",
+    "title": "LinkFreePlus Analytics",
+    "description": "The Analytics configuration file for a LinkFreePlus instance.",
+    "type": "object",
+    "properties": {
+        "analyticsServiceName": {
+            "description": "The name of the Analytics service. Example: Google Analytics.",
+            "type": "string"
+        },
+        "analyticsServiceUniqueID": {
+            "description": "A unique identifier used by the analytics service to identify your application.",
+            "type": "string"
+        },
+        "tags": {
+            "description": "A collection of tags used by the LinkFreePlus instance to enable analytics functionality.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "tagName": {
+                        "description": "The name of the HTML tag.",
+                        "type": "string"
+                    },
+                    "tagType": {
+                        "description": "The type of HTML tag to be used.",
+                        "type": "string"
+                    },
+                    "parentTag": {
+                        "description": "The name of the HTML tag the current tag needs to be attached to, as a child.",
+                        "type": "string"
+                    },
+                    "attributes": {
+                        "description": "A collection of HTML tag attributes defined for the current HTML tag.",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "attributeName": {
+                                    "description": "The name of the HTML tag attribute.",
+                                    "type": "string"
+                                },
+                                "attributeValue": {
+                                    "description": "The value associated with the HTML tag attribute.",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "tagContent": {
+                        "description": "The contents of the HTML tag.",
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
