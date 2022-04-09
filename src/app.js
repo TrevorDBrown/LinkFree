@@ -15,15 +15,14 @@ const redirects = require('./redirects');
 app.use('/fa/', express.static(__dirname + "./../node_modules/@fortawesome/fontawesome-free/"));
 app.use('/js/', express.static(__dirname + "/js/"));
 app.use('/css/', express.static(__dirname + "/css/"));
-app.use('/images/', express.static(__dirname + "/images/"));
-app.use('/private/images/', express.static(__dirname + "/private/images/"));
+app.use('/images/', [express.static(__dirname + "/images/"), express.static(__dirname + "/private/images/")]);
 
 // Endpoints
 app.get('/', (req, res, next) => {
     linkfree.areCoreFilesPresent((error, isThemesJSONPresent, isLinkfreeJSONPresent) => {
         if (isThemesJSONPresent && isLinkfreeJSONPresent){
             // All core files are present. Continue processing...
-            linkfree.generateLinkPage((error, pageContent) => {
+            linkfree.generateLinkPage((error, pageContent) => {          
                 if (!error){
                     res.status(200).send(pageContent);
                 }else{
