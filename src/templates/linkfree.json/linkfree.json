@@ -1,0 +1,83 @@
+{
+    "displayName": "Your Name Here!",
+    "tagline": "Some unique tagline for yourself!",
+    "profilePicture": "./private/images/Profile.png",
+    "theme": "DarkMode",
+    "linkTrayOnTop": true,
+    "linkGroupsAboveUnsorted": false,
+    "linkGroups": [
+        {
+            "linkGroupName": "A Link Group!",
+            "showLinkGroupName": true,
+            "useLinkIcons": false,
+            "linkGroupPosition": 1,
+            "linkGroupEnabled": true
+        }
+    ],
+    "links": [
+        {
+            "linkName": "A web link!",
+            "linkType": "web",
+            "linkHref": "https://github.com/TrevorDBrown/LinkFreePlus",
+            "newWindow": true,
+            "enabled": true,
+            "linkGroups": [
+                {
+                    "linkGroupName": "A Link Group!",
+                    "linkPosition": 1,
+                    "show": true
+                }
+            ]
+        },
+        {
+            "linkName": "A link in the Link Tray!",
+            "linkType": "web",
+            "linkHref": "https://example.com/",
+            "newWindow": true,
+            "enabled": true,
+            "linkGroups": [
+                {
+                    "linkGroupName": "Tray",
+                    "linkPosition": 1,
+                    "show": true
+                }
+            ]
+        },
+        {
+            "linkName": "An enabled, but hidden link...",
+            "linkType": "web",
+            "linkHref": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "newWindow": true,
+            "enabled": true,
+            "linkGroups": [
+                {
+                    "linkGroupName": "Unsorted",
+                    "linkPosition": 2,
+                    "show": false
+                }
+            ]
+        },
+        {
+            "linkName": "A disabled link...",
+            "linkType": "web",
+            "linkHref": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "newWindow": true,
+            "enabled": false,
+            "linkGroups": []
+        },
+        {
+            "linkName": "A link that is in the Link Tray that has a special icon!",
+            "linkType": "home",
+            "linkHref": "",
+            "newWindow": true,
+            "enabled": true,
+            "linkGroups": [
+                {
+                    "linkGroupName": "Tray",
+                    "linkPosition": 2,
+                    "show": true
+                }
+            ]
+        }
+    ]
+}
