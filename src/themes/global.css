@@ -1,0 +1,33 @@
+#linkfree-profile, #links-tray {
+    width: 100%;
+    text-align: center;
+    display: inline-block;
+}
+
+#links-tray > .link, .link-icon {
+    display: inline-block;
+    margin: 5px; 
+    text-align: center;
+    background-color: transparent;
+    border-color: transparent;
+    color: #ffffff;
+    mix-blend-mode: normal;
+    font-size: 50px;
+}
+
+#links-tray > .link:hover, .link.link-icon:hover {
+    opacity: 0.5;
+}
+
+#linkfree-profile-picture{
+    border-radius: 50%;
+    width: 110px;
+    height: 110px;
+}
+
+#linkfree-profile-name, #linkfree-profile-tagline{
+    color: #ffffff;
+    mix-blend-mode: normal;
+    font-family: var(--font);
+    margin: 5px;
+}

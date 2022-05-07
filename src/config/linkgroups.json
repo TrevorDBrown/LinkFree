@@ -1,0 +1,16 @@
+[
+    {
+        "linkGroupName": "Tray",
+        "showLinkGroupName": false,
+        "useLinkIcons": true,
+        "linkGroupPosition": 0,
+        "linkGroupEnabled": true
+    },
+    {
+        "linkGroupName": "Unsorted",
+        "showLinkGroupName": false,
+        "useLinkIcons": false,
+        "linkGroupPosition": 0,
+        "linkGroupEnabled": true
+    }
+]
