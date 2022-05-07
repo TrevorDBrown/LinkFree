@@ -19,8 +19,8 @@ app.use('/images/', [express.static(__dirname + "/images/"), express.static(__di
 
 // Endpoints
 app.get('/', (req, res, next) => {
-    linkfree.areCoreFilesPresent((error, isThemesJSONPresent, isLinkfreeJSONPresent) => {
-        if (isThemesJSONPresent && isLinkfreeJSONPresent){
+    linkfree.areCoreFilesPresent((error, isThemesJSONPresent, isLinkfreeJSONPresent, isLinkGroupsJSONPresent, isGlobalCSSFilePresent) => {
+        if (isThemesJSONPresent && isLinkfreeJSONPresent && isLinkGroupsJSONPresent && isGlobalCSSFilePresent){
             // All core files are present. Continue processing...
             linkfree.generateLinkPage((error, pageContent) => {          
                 if (!error){
@@ -41,6 +41,14 @@ app.get('/', (req, res, next) => {
                 errorResponse += "linkfree.json <br />";
             }
 
+            if (!isLinkGroupsJSONPresent){
+                errorResponse += "linkgroups.json <br />";
+            }
+
+            if (!isGlobalCSSFilePresent){
+                errorResponse += "global.css";
+            }
+            
             errorResponse += "<br />Please contact the site administrator for assistance.</p>";
 
             res.status(500).send(errorResponse);
