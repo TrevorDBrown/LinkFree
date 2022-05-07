@@ -30,6 +30,12 @@
             "css": "style.css",
             "available": true,
             "note": ""
+        },
+        {
+            "themeName": "SupportUkraine",
+            "css": "style.css",
+            "available": true,
+            "note": ""
         }
     ],
     "linkThemes": [
