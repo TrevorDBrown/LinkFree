@@ -9,7 +9,7 @@
 const cheerio = require('cheerio');
 const fs = require('fs');
 
-var themesConfigFilePath = './src/themes.json';
+var themesConfigFilePath = './src/config/themes.json';
 var linkFreeConfigFilePath = './src/private/linkfree.json';
 var analyticsConfigFilePath = './src/private/analytics.json';
 
