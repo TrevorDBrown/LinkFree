@@ -9,7 +9,9 @@
 const cheerio = require('cheerio');
 const fs = require('fs');
 
+var globalCSSFilePath = './src/themes/global.css';
 var themesConfigFilePath = './src/config/themes.json';
+var linkGroupsConfigFilePath = './src/config/linkgroups.json';
 var linkFreeConfigFilePath = './src/private/linkfree.json';
 var analyticsConfigFilePath = './src/private/analytics.json';
 
@@ -50,27 +52,19 @@ function getLinkInstance(link, linkGroup){
 function generateSpecialGroups(callback){
     var specialGroups = []
 
-    // TODO: consider putting these into another JSON file? 
-    var linkTrayLinkGroup = {
-        "linkGroupName": "Tray",
-        "showLinkGroupName": false,
-        "useLinkIcons": true,
-        "linkGroupPosition": 0,
-        "linkGroupEnabled": true
-    };
+    fs.readFile(linkGroupsConfigFilePath, (error, linkGroupsConfigFileContent) => {
+        if (!error){
+            var linkGroupsConfig = JSON.parse(linkGroupsConfigFileContent.toString());
 
-    var unsortedLinkGroup = {
-        "linkGroupName": "Unsorted",
-        "showLinkGroupName": false,
-        "useLinkIcons": false,
-        "linkGroupPosition": 0,
-        "linkGroupEnabled": true
-    };
+            linkGroupsConfig.forEach(linkGroup => {
+                specialGroups.push(linkGroup);
+            });
 
-    specialGroups.push(unsortedLinkGroup);
-    specialGroups.push(linkTrayLinkGroup);
-
-    return callback(null, specialGroups);
+            return callback(null, specialGroups);
+        }else{
+            return callback(null, null);
+        }
+    });
 }
 
 function parseLinkGroups(linkFreeConfig, callback){
@@ -183,55 +177,59 @@ function generateLinks(linkFreeConfig, themesConfig, linkGroups, $, callback){
         // Find all links in the config associated with this group.
         getLinkListForGroup(linkFreeConfig, linkGroup, (error, linkList) => {
             var linkGroupDivID = "#" + getLinkGroupDivID(linkGroup); // Results in: linkgroup-group-name (or links-tray)
-
             var linkGroupDiv = $(linkGroupDivID);
 
             if (!error){
-                linkList.forEach(link => {
+                if (Object.keys(linkList).length > 0) {
+                    linkList.forEach(link => {
 
-                    if (link.enabled){
-                        // Prepare the base link
-                        var linkTag = $("<a>");
-                        linkTag.attr("href", link.linkHref);
-            
-                        if (link.newWindow){
-                            linkTag.attr("target", "_blank");
-                        }
-
-                        linkTag.attr("class", "link");
-
-                        linkGroupInstance = link.linkGroups.find((linkGroupInstance) => {
-                            return linkGroupInstance.linkGroupName === linkGroup.linkGroupName;
-                        });
-            
-                        if (linkGroupInstance.show){
-                            var linkTagInstance = linkTag.clone();
-        
-                            displayLinkTextOrIcon(linkFreeConfig, linkGroup, (error, displayAsIcon) => {
-                                if (displayAsIcon){
-                                    linkTagInstance.addClass("link-icon");
-                                    
-                                    getLinkIconClass(link.linkType, themesConfig.linkThemes, (error, linkClass, defaultLinkClass) => {
-                                        var linkTrayLinkTextTag = $("<i>");
+                        if (link.enabled){
+                            // Prepare the base link
+                            var linkTag = $("<a>");
+                            linkTag.attr("href", link.linkHref);
                 
-                                        if (!error){
-                                            linkTrayLinkTextTag.addClass(linkClass);
-                                        }else{
-                                            linkTrayLinkTextTag.addClass(defaultLinkClass);
-                                        }
-                
-                                        linkTagInstance.append(linkTrayLinkTextTag);
-                                        linkGroupDiv.append(linkTagInstance);
-                                    });        
-                                }else{
-                                    linkTagInstance.append(link.linkName);
-                                    linkGroupDiv.append(linkTagInstance);
-                                }
+                            if (link.newWindow){
+                                linkTag.attr("target", "_blank");
+                            }
+    
+                            linkTag.attr("class", "link");
+    
+                            linkGroupInstance = link.linkGroups.find((linkGroupInstance) => {
+                                return linkGroupInstance.linkGroupName === linkGroup.linkGroupName;
                             });
+                
+                            if (linkGroupInstance.show){
+                                var linkTagInstance = linkTag.clone();
+            
+                                displayLinkTextOrIcon(linkFreeConfig, linkGroup, (error, displayAsIcon) => {
+                                    if (displayAsIcon){
+                                        linkTagInstance.addClass("link-icon");
+                                        
+                                        getLinkIconClass(link.linkType, themesConfig.linkThemes, (error, linkClass, defaultLinkClass) => {
+                                            var linkTrayLinkTextTag = $("<i>");
+                    
+                                            if (!error){
+                                                linkTrayLinkTextTag.addClass(linkClass);
+                                            }else{
+                                                linkTrayLinkTextTag.addClass(defaultLinkClass);
+                                            }
+                    
+                                            linkTagInstance.append(linkTrayLinkTextTag);
+                                            linkGroupDiv.append(linkTagInstance);
+                                        });        
+                                    }else{
+                                        linkTagInstance.append(link.linkName);
+                                        linkGroupDiv.append(linkTagInstance);
+                                    }
+                                });
+                            }
+                            
                         }
-                        
-                    }
-                });
+                    });
+                }else{
+                    linkGroupDiv.remove();
+                }
+
             }else{
                 console.log(error);
             }
@@ -298,153 +296,121 @@ function generatePageContent(linkFreeConfig, linkGroups, themesConfig, callback)
     faJSTag.attr("src", "./fa/js/all.min.js");
     
     getTheme(false, linkFreeConfig, themesConfig, (error, themeCSSContent) => {
-        var styleTag = $("<style>");
+        fs.readFile(globalCSSFilePath, (error, globalCSSFileContent) => {
+            var styleTag = $("<style>");
 
-        var linksTrayDivCSS = `
-            #linkfree-profile, #links-tray {
-                width: 100%;
-                text-align: center;
-                display: inline-block;
-            }
-
-            #links-tray > .link, .link-icon {
-                display: inline-block;
-                margin: 5px; 
-                text-align: center;
-                background-color: transparent;
-                border-color: transparent;
-                color: #ffffff;
-                mix-blend-mode: difference;
-                font-size: 50px;
-            }
-
-            #links-tray > .link:hover, .link.link-icon:hover {
-                opacity: 0.5;
-            }
-
-            #linkfree-profile-picture{
-                border-radius: 50%;
-                width: 110px;
-                height: 110px;
-            }
+            var linksTrayDivCSS = globalCSSFileContent.toString();
             
-            #linkfree-profile-name, #linkfree-profile-tagline{
-                color: #ffffff;
-                mix-blend-mode: difference;
-                font-family: var(--font);
-                margin: 5px;
+            if (!error){
+                styleTag.append(themeCSSContent);
+                styleTag.append("\n\n");
+                styleTag.append(linksTrayDivCSS);
             }
 
-        `;
-        
-        if (!error){
-            styleTag.append(themeCSSContent);
-            styleTag.append(linksTrayDivCSS);
-        }
+            // Metadata
+            headTag.append(viewportMetaTag);
+            headTag.append(charsetMetaTag);
+            headTag.append(titleTag);
 
-        // Metadata
-        headTag.append(viewportMetaTag);
-        headTag.append(charsetMetaTag);
-        headTag.append(titleTag);
+            // Theme Data
+            headTag.append(styleTag);
+            
+            // Font Awesome
+            headTag.append(faCSSTag);
+            headTag.append(faJSTag);
+            
+            // Begin preparing body content.
+            var bodyTag = $("body");
 
-        // Theme Data
-        headTag.append(styleTag);
-        
-        // Font Awesome
-        headTag.append(faCSSTag);
-        headTag.append(faJSTag);
-        
-        // Begin preparing body content.
-        var bodyTag = $("body");
+            // Profile Information
+            var profileInfoDivTag = $("<div>");
+            profileInfoDivTag.attr("id", "linkfree-profile");
 
-        // Profile Information
-        var profileInfoDivTag = $("<div>");
-        profileInfoDivTag.attr("id", "linkfree-profile");
+            var profilePictureTag = $("<img>");
+            profilePictureTag.attr("id", "linkfree-profile-picture");
 
-        var profilePictureTag = $("<img>");
-        profilePictureTag.attr("id", "linkfree-profile-picture");
+            var profileNameTag = $("<h1>");
+            profileNameTag.attr("id", "linkfree-profile-name");
 
-        var profileNameTag = $("<h1>");
-        profileNameTag.attr("id", "linkfree-profile-name");
+            var profileTaglineTag = $("<h4>");
+            profileTaglineTag.attr("id", "linkfree-profile-tagline");
 
-        var profileTaglineTag = $("<h4>");
-        profileTaglineTag.attr("id", "linkfree-profile-tagline");
-
-        // Profile Picture
-        if (linkFreeConfig.profilePicture){
-            profilePictureTag.attr("src", linkFreeConfig.profilePicture);
-            profileInfoDivTag.append(profilePictureTag);
-        }
-
-        // Display Name
-        if (linkFreeConfig.displayName){
-            profileNameTag.append(linkFreeConfig.displayName);
-            profileInfoDivTag.append(profileNameTag);
-        }
-
-        // Tagline/Description
-        if (linkFreeConfig.tagline){
-            profileTaglineTag.append(linkFreeConfig.tagline);
-            profileInfoDivTag.append(profileTaglineTag);
-        }
-
-        // Append Profile Information to Body
-        if (linkFreeConfig.profilePicture || linkFreeConfig.displayName || linkFreeConfig.tagline){
-            bodyTag.append(profileInfoDivTag);
-        }
-
-        var linksTrayDiv = $("<div>");
-        linksTrayDiv.attr("id", "links-tray");
-
-        var linksDiv = $("<div>");
-        linksDiv.attr("id", "links");
-
-        // Add the link groups to the page...
-        linkGroups.forEach(linkGroup => {
-            var newLinkGroup = $("<div>");
-            var newLinkGroupID = "";
-
-            if (linkGroup.linkGroupName != "Tray"){
-                newLinkGroupID = getLinkGroupDivID(linkGroup);   // Results in: linkgroup-group-name
-                newLinkGroup.attr("id", newLinkGroupID);
-                newLinkGroup.addClass("link-group");
-
-                if (linkGroup.showLinkGroupName){
-                    var newLinkGroupNameTextTag = $("<span>");
-                    newLinkGroupNameTextTag.addClass("linkgroup-title");
-
-                    newLinkGroupNameTextTag.append(linkGroup.linkGroupName);
-                    newLinkGroup.append(newLinkGroupNameTextTag);
-                }
-
-                linksDiv.append(newLinkGroup);
+            // Profile Picture
+            if (linkFreeConfig.profilePicture){
+                profilePictureTag.attr("src", linkFreeConfig.profilePicture);
+                profileInfoDivTag.append(profilePictureTag);
             }
 
-        });
+            // Display Name
+            if (linkFreeConfig.displayName){
+                profileNameTag.append(linkFreeConfig.displayName);
+                profileInfoDivTag.append(profileNameTag);
+            }
 
-        if (linkFreeConfig.linkTrayOnTop){
-            bodyTag.append(linksTrayDiv);
-            bodyTag.append(linksDiv);
-        }else{
-            bodyTag.append(linksDiv);
-            bodyTag.append(linksTrayDiv);
-        }
+            // Tagline/Description
+            if (linkFreeConfig.tagline){
+                profileTaglineTag.append(linkFreeConfig.tagline);
+                profileInfoDivTag.append(profileTaglineTag);
+            }
 
-        generateLinks(linkFreeConfig, themesConfig, linkGroups, $, (error, $) => {
-            generateAnalyticsTags((error, headTags, bodyTags) => {
-                if (!error){
-                    headTags.forEach(tag => {
-                        headTag.append(tag);
-                    });
-        
-                    bodyTags.forEach(tag => {
-                        bodyTag.append(tag);
-                    });
-    
-                    return callback(null, $.html());
-                }else{
-                    return callback(null, $.html());
+            // Append Profile Information to Body
+            if (linkFreeConfig.profilePicture || linkFreeConfig.displayName || linkFreeConfig.tagline){
+                bodyTag.append(profileInfoDivTag);
+            }
+
+            var linksTrayDiv = $("<div>");
+            linksTrayDiv.attr("id", "links-tray");
+
+            var linksDiv = $("<div>");
+            linksDiv.attr("id", "links");
+
+            // Add the link groups to the page...
+            linkGroups.forEach(linkGroup => {
+                var newLinkGroup = $("<div>");
+                var newLinkGroupID = "";
+
+                if (linkGroup.linkGroupName != "Tray"){
+                    newLinkGroupID = getLinkGroupDivID(linkGroup);   // Results in: linkgroup-group-name
+                    newLinkGroup.attr("id", newLinkGroupID);
+                    newLinkGroup.addClass("link-group");
+
+                    if (linkGroup.showLinkGroupName){
+                        var newLinkGroupNameTextTag = $("<span>");
+                        newLinkGroupNameTextTag.addClass("linkgroup-title");
+
+                        newLinkGroupNameTextTag.append(linkGroup.linkGroupName);
+                        newLinkGroup.append(newLinkGroupNameTextTag);
+                    }
+
+                    linksDiv.append(newLinkGroup);
                 }
+
+            });
+
+            if (linkFreeConfig.linkTrayOnTop){
+                bodyTag.append(linksTrayDiv);
+                bodyTag.append(linksDiv);
+            }else{
+                bodyTag.append(linksDiv);
+                bodyTag.append(linksTrayDiv);
+            }
+
+            generateLinks(linkFreeConfig, themesConfig, linkGroups, $, (error, $) => {
+                generateAnalyticsTags((error, headTags, bodyTags) => {
+                    if (!error){
+                        headTags.forEach(tag => {
+                            headTag.append(tag);
+                        });
+            
+                        bodyTags.forEach(tag => {
+                            bodyTag.append(tag);
+                        });
+        
+                        return callback(null, $.html());
+                    }else{
+                        return callback(null, $.html());
+                    }
+                });
             });
         });
     });
@@ -488,6 +454,8 @@ var generateLinkPage = function generateLinkPage(callback){
 var areCoreFilesPresent = function areCoreFilesPresent(callback){
     var isThemesJSONPresent = false;
     var isLinkFreeJSONPresent = false;
+    var isLinkGroupsJSONPresent = false;
+    var isGlobalCSSFilePresent = false;
 
     fs.stat(themesConfigFilePath, (error, themesStats) => {
         if (!error){
@@ -503,7 +471,23 @@ var areCoreFilesPresent = function areCoreFilesPresent(callback){
                 isLinkFreeJSONPresent = false;
             }
 
-            return callback(null, isThemesJSONPresent, isLinkFreeJSONPresent);
+            fs.stat(linkGroupsConfigFilePath, (error, linkGroupsStats) => {
+                if (!error){
+                    isLinkGroupsJSONPresent = true;
+                }else{
+                    isLinkGroupsJSONPresent = false;
+                }
+
+                fs.stat(globalCSSFilePath, (error, globalCSSStats) => {
+                    if (!error){
+                        isGlobalCSSFilePresent = true;
+                    }else{
+                        isGlobalCSSFilePresent = false;
+                    }
+
+                    return callback(null, isThemesJSONPresent, isLinkFreeJSONPresent, isLinkGroupsJSONPresent, isGlobalCSSFilePresent);
+                });
+            });
         });
     });
 
