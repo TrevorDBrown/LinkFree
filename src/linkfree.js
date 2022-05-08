@@ -369,6 +369,8 @@ function generatePageContent(linkFreeConfig, linkGroups, themesConfig, callback)
                 var newLinkGroup = $("<div>");
                 var newLinkGroupID = "";
 
+                var newLinkGroupDivider = $("<hr>");
+
                 if (linkGroup.linkGroupName != "Tray"){
                     newLinkGroupID = getLinkGroupDivID(linkGroup);   // Results in: linkgroup-group-name
                     newLinkGroup.attr("id", newLinkGroupID);
@@ -381,8 +383,13 @@ function generatePageContent(linkFreeConfig, linkGroups, themesConfig, callback)
                         newLinkGroupNameTextTag.append(linkGroup.linkGroupName);
                         newLinkGroup.append(newLinkGroupNameTextTag);
                     }
+                    
+                    if (linkFreeConfig.linkGroupsVisibleDivider){
+                        linksDiv.append(newLinkGroupDivider.clone());
+                    }
 
                     linksDiv.append(newLinkGroup);
+                    
                 }
 
             });
