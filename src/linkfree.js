@@ -366,25 +366,34 @@ function generatePageContent(linkFreeConfig, linkGroups, themesConfig, callback)
 
             // Add the link groups to the page...
             linkGroups.forEach(linkGroup => {
-                var newLinkGroup = $("<div>");
-                var newLinkGroupID = "";
 
-                if (linkGroup.linkGroupName != "Tray"){
-                    newLinkGroupID = getLinkGroupDivID(linkGroup);   // Results in: linkgroup-group-name
-                    newLinkGroup.attr("id", newLinkGroupID);
-                    newLinkGroup.addClass("link-group");
+                if (linkGroup.linkGroupEnabled){
+                    var newLinkGroup = $("<div>");
+                    var newLinkGroupID = "";
 
-                    if (linkGroup.showLinkGroupName){
-                        var newLinkGroupNameTextTag = $("<span>");
-                        newLinkGroupNameTextTag.addClass("linkgroup-title");
+                    var newLinkGroupDivider = $("<hr>");
 
-                        newLinkGroupNameTextTag.append(linkGroup.linkGroupName);
-                        newLinkGroup.append(newLinkGroupNameTextTag);
+                    if (linkGroup.linkGroupName != "Tray"){
+                        newLinkGroupID = getLinkGroupDivID(linkGroup);   // Results in: linkgroup-group-name
+                        newLinkGroup.attr("id", newLinkGroupID);
+                        newLinkGroup.addClass("link-group");
+
+                        if (linkGroup.showLinkGroupName){
+                            var newLinkGroupNameTextTag = $("<span>");
+                            newLinkGroupNameTextTag.addClass("linkgroup-title");
+
+                            newLinkGroupNameTextTag.append(linkGroup.linkGroupName);
+                            newLinkGroup.append(newLinkGroupNameTextTag);
+                        }
+                        
+                        if (linkFreeConfig.linkGroupsVisibleDivider){
+                            linksDiv.append(newLinkGroupDivider.clone());
+                        }
+
+                        linksDiv.append(newLinkGroup);
+                        
                     }
-
-                    linksDiv.append(newLinkGroup);
                 }
-
             });
 
             if (linkFreeConfig.linkTrayOnTop){
